@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+   			 xmlns:vm="clr-namespace:WalletApp.ViewModels"
+             x:Class="WalletApp.Views.LoginPage"
+             Title="Login">
+
+    <ContentPage.BindingContext>
+        <vm:LoginPageViewModel />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout Spacing="20" Padding="30">
+
+        <Label Text="Login to Your Account"
+               VerticalOptions="Start" 
+               HorizontalOptions="Center"
+               FontSize="Medium" />
+
+        <Entry x:Name="UsernameEntry"
+               Placeholder="Username"
+               Text="{Binding Username}"
+               VerticalOptions="Start" 
+               Keyboard="Default" />
+
+        <Entry x:Name="PasswordEntry"
+               Placeholder="Password"
+               Text="{Binding Password}"
+               IsPassword="True"
+               VerticalOptions="Start" 
+               Keyboard="Default" />
+
+        <Button Text="Login"
+                Command="{Binding LoginCommand}"
+                VerticalOptions="End" />
+
+    </VerticalStackLayout>
+</ContentPage>
