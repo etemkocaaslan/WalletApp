@@ -6,46 +6,43 @@ namespace WalletApp
     {
         private static SortedList<string, int> requestList = new();
 
-
         public static async Task<bool> POSTLoginAsync(BaseViewModel callerViewModel, string username, string password)
         {
             const string Request_ID = "Post-Login";
-            await PreRequest(callerViewModel, Request_ID);
+            await PreRequest(callerViewModel);
             try
             {
-                return true;
+                // Add logic for login request
+                return true; 
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
-                DisplayRequestError(callerViewModel, e);
+                await DisplayRequestError(callerViewModel, e);
+                return false; // Return false in case of an exception
             }
             finally
             {
                 AfterRequest(callerViewModel, Request_ID);
             }
-            return true;
         }
-        private static void AfterRequest(BaseViewModel callerViewModel, string requestID)
+
+        private static void AfterRequest(BaseViewModel callerViewModel, string requestId)
         {
-            requestList[requestID] = Math.Abs(requestList[requestID]);
             NotBusy(callerViewModel);
+            //remove or update the requestId in requestList here
         }
-        private static async Task PreRequest(BaseViewModel callerViewModel, string requestID, int delay = 0, bool isBusy = true)
+
+        private static Task PreRequest(BaseViewModel callerViewModel, bool isBusy = true)
         {
-            await OrderRequest(requestID, delay);
-
-            if (isBusy)
-                try { callerViewModel.IsBusy = true; } catch { }
-
-            await Task.Delay(delay);
+            // Add logic for pre-request actions
+            return Task.CompletedTask;
         }
 
         private static bool NotBusy(BaseViewModel callerViewModel)
         {
-            for (int i = 0; i < requestList.Count; i++)
+            foreach (var entry in requestList)
             {
-                string key = requestList.Keys[i];
-                if (requestList.TryGetValue(key, out int value) && value < 0)
+                if (entry.Value < 0)
                     return false;
             }
 
@@ -54,53 +51,14 @@ namespace WalletApp
 
             return true;
         }
-        private static async Task<bool> OrderRequest(string requestName, int delay = 0)
+
+        private static async Task DisplayRequestError(BaseViewModel callerViewModel, Exception e)
         {
-            if (requestList.TryGetValue(requestName, out int order))
+            if (callerViewModel?.ContentPage != null)
             {
-                if (requestList[requestName] > 0)
-                {
-                    order++;
-                    requestList[requestName] = order;
-                }
-                else
-                {
-                    if (requestList[requestName] < 0)
-                    {
-                        order--;
-                        requestList[requestName] = order;
-
-                        int count = 0;
-                        while (requestList[requestName] < 0 || requestList[requestName] != Math.Abs(order))
-                        {
-                            await Task.Delay(8);
-                            if (count > 700)
-                                return false;
-                        }
-                    }
-                }
+                await callerViewModel.ContentPage.DisplayAlert("Request Error", e.Message, "Okay");
             }
-            else
-            {
-                order = 1;
-                requestList[requestName] = 1;
-            }
-
-            await Task.Delay(delay);
-
-            if (requestList.TryGetValue(requestName, out int value) && value != Math.Abs(order))
-                return false;
-
-            requestList[requestName] *= -1;
-
-            return true;
         }
-
-        private static async void DisplayRequestError(BaseViewModel callerViewModel, Exception e)
-        {
-            await callerViewModel.ContentPage.DisplayAlert("Request Error", e.Message, "Okay");
-        }
-
-
     }
+
 }
