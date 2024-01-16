@@ -12,7 +12,6 @@ namespace WalletApp
             await PreRequest(callerViewModel);
             try
             {
-                // Add logic for login request
                 return true; 
             }
             catch (Exception e)
